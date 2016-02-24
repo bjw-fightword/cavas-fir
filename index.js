@@ -1,7 +1,9 @@
 window.onload = function () {
-	var 
-  canvas = document.querySelector('#canvas'),
-  ctx = canvas.getContext('2d'),
+  canvas = document.querySelector('#canvas');
+  ctx = canvas.getContext('2d');
+  canvas1 = document.querySelector('#canvas1');
+  ctx1 = canvas1.getContext('2d');
+
   //棋盘大小
   ROW = 15,
   //棋盘星点位置数据
@@ -13,13 +15,19 @@ window.onload = function () {
   var huaqipan = function() {
     ctx.clearRect(0,0,600,600);
     for(var i = 0; i < ROW; i++){
-      
+      var li = ctx.createLinearGradient(0,0,560,0);
+      li.addColorStop(0.5,'#000');
+      li.addColorStop(1,'black');
+      ctx.strokeStyle = li;
       ctx.beginPath();
       ctx.moveTo(20,i*40 + 20.5);
       ctx.lineTo(580,i*40 + 20.5);
       ctx.stroke();
 
-      
+      var li = ctx.createLinearGradient(0,0,0,560);
+      li.addColorStop(0.5,'#000');
+      li.addColorStop(1,'#000');
+      ctx.strokeStyle = li;
       ctx.beginPath();
       ctx.moveTo(i*40+20.5,20);
       ctx.lineTo(i*40+20.5,580);
@@ -44,22 +52,22 @@ window.onload = function () {
   //  y    number   落子y坐标
   //  color boolean  true代表黑子  false代表白子 
   
-  var luozi2 = function (x,y,color) {  
+  var luozi = function (x,y,color) {  
     var zx = 40*x + 20.5;
     var zy = 40*y + 20.5;
-    var black = ctx.createRadialGradient(zx,zy,1,zx,zy,18);
+    var black = ctx1.createRadialGradient(zx,zy,1,zx,zy,18);
     black.addColorStop(0.1,'#555');
     black.addColorStop(1,'black'); 
-    var white = ctx.createRadialGradient(zx,zy,1,zx,zy,18);
+    var white = ctx1.createRadialGradient(zx,zy,1,zx,zy,18);
     white.addColorStop(0.1,'#fff');
     white.addColorStop(1,'#ddd');
-    ctx.fillStyle= color?black:white;
-    ctx.beginPath();
-    ctx.arc(zx,zy,18,0,Math.PI*2);
-    ctx.fill();
+    ctx1.fillStyle= color?black:white;
+    ctx1.beginPath();
+    ctx1.arc(zx,zy,18,0,Math.PI*2);
+    ctx1.fill();
   }
   var qiziimg = document.querySelector('#sucai');
-  var luozi = function(x,y,color) {
+  var luozi2 = function(x,y,color) {
     var zx = 40*x + 2.5;
     var zy = 40*y + 2.5;
     if(color){
@@ -70,7 +78,7 @@ window.onload = function () {
     }
   }
 
-  canvas.onclick = function (e) {
+  canvas1.onclick = function (e) {
     var zx = 40*x + 20.5;
     var zy = 40*y + 20.5;
     var x =  Math.round( (e.offsetX-20.5)/40 ); 
@@ -142,8 +150,7 @@ window.onload = function () {
     }
     return r;
   }
-
-  /*如果本地存储中有棋盘数据,读取这些数据并绘制到页面中*/
+/*如果本地存储中有棋盘数据,读取这些数据并绘制到页面中*/
   if(localStorage.data){
     qizi =  JSON.parse(localStorage.data);
     for(var i in qizi){
@@ -152,12 +159,57 @@ window.onload = function () {
       luozi(x,y, (qizi[i]=='black')?true:false );
     }
   }
-
-  canvas.ondblclick = function (e) {
-    e.stopPropagation();
-  }
-  document.ondblclick = function () {
+//悔棋
+  var huiqi = document.querySelector('.huiqi');
+  huiqi.onclick = function(){
+        var r=[];
+        var w=[];
+        data=JSON.parse(localStorage.data);
+        if(JSON.stringify(data)==0){
+          huiqi.onclick=null;
+          return;
+        }
+        for(var i in data){
+          r.push(i);
+          w.push(data[i]);
+        }
+        r.pop();
+        w.pop();
+        for(var i=0;i<r.length;i++){
+          var x=r[i].split('-')[0];
+          var y=r[i].split('-')[1];
+          luozi(x,y,(w[i]=='black')?true:false);
+          if((w[i]=='black')?true:false){
+            localStorage.x=1;
+          }
+          else{
+            localStorage.removeItem('x');
+          }
+        }
+        data={};
+        for(var i=0;i<w.length;i++){
+          var x=r[i].split('-')[0];
+          var y=r[i].split('-')[1];
+          data[x+'-'+y]=w[i];
+        
+        if((w[i]=='black')?true:false){
+          localStorage.x=1;
+        }
+        else{
+          localStorage.removeItem('x');
+        }
+      }
+        localStorage.data=JSON.stringify(data);
+        location.reload();
+      } 
+//重置
+  var chongzhi=document.querySelector(".chongzhi");
+  chongzhi.onclick = function () {
     localStorage.clear();
     location.reload();
   }
 }
+
+
+
+
