@@ -46,8 +46,6 @@ window.onload = function () {
     }
   }
   huaqipan();
-
- 
   // x    number   落子x坐标
   //  y    number   落子y坐标
   //  color boolean  true代表黑子  false代表白子 
